@@ -1,0 +1,130 @@
+McXtrace simulation description file for Test_Fluorescence.
+Date:    Tue Mar  5 10:35:02 2024
+Program: McXtrace 3.4-20240304 - mars. 05, 2024
+
+begin instrument: Test_Fluorescence
+  File: /home/experiences/grades/farhie/dev/Schools/2024/SOLEIL_Hercules_March_2024/simulations/Test_Fluorescence/Test_Fluorescence_20240305_103458/mccode
+  Source: Test_Fluorescence.instr
+  Parameters:  material(string) E0(double) dE(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: /home/experiences/grades/farhie/dev/Schools/2024/SOLEIL_Hercules_March_2024/simulations/Test_Fluorescence/Test_Fluorescence_20240305_103458
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator: McXtrace 3.4-20240304 - mars. 05, 2024
+  Instrument: Test_Fluorescence.instr
+  Ncount: 1000000
+  Trace: no
+  Gravitation: no
+  Seed: 1709631302248251
+  Directory: /home/experiences/grades/farhie/dev/Schools/2024/SOLEIL_Hercules_March_2024/simulations/Test_Fluorescence/Test_Fluorescence_20240305_103458
+  Nodes: 4
+  Param: material=LaB6
+  Param: E0=39
+  Param: dE=0.06
+end simulation
+
+begin data
+  Date: Tue Mar  5 10:35:15 2024 (1709631315)
+  type: array_1d(2001)
+  Source: Test_Fluorescence (Test_Fluorescence.instr)
+  component: emon
+  position: 0 0 3.1
+  title: Energy monitor
+  Ncount: 1000000
+  filename: emon.dat
+  statistics: X0=29.3477; dX=12.9322;
+  signal: Min=0; Max=1.11227e-13; Mean=3.59919e-16;
+  values: 7.20198e-13 1.85512e-15 989492
+  xvar: E
+  yvar: (I,I_err)
+  xlabel: Energy [keV]
+  ylabel: Intensity
+  xlimits: 0 46.8
+  variables: E I I_err N
+end data
+
+begin data
+  Date: Tue Mar  5 10:35:15 2024 (1709631315)
+  type: array_2d(100, 100)
+  Source: Test_Fluorescence (Test_Fluorescence.instr)
+  component: psd
+  position: 0 0 3.2
+  title: PSD monitor
+  Ncount: 1000000
+  filename: psd.dat
+  statistics: X0=-4.09152e-07; dX=0.00036186; Y0=7.20121e-07; dY=0.000363034;
+  signal: Min=4.88966e-18; Max=2.1505e-16; Mean=6.33583e-17;
+  values: 6.33583e-13 1.74042e-15 870106
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [m]
+  ylabel: Y position [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -0.00075 0.00075 -0.00075 0.00075
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  5 10:35:15 2024 (1709631315)
+  type: array_1d(2001)
+  Source: Test_Fluorescence (Test_Fluorescence.instr)
+  component: emon_fluo
+  position: 0 0 3.3
+  title: Energy monitor
+  Ncount: 1000000
+  filename: Fluorescence.dat
+  statistics: X0=27.1593; dX=13.3875;
+  signal: Min=0; Max=6.94828e-15; Mean=1.83245e-17;
+  values: 3.66672e-14 1.50524e-16 61375
+  xvar: E
+  yvar: (I,I_err)
+  xlabel: Energy [keV]
+  ylabel: Intensity
+  xlimits: 0 46.8
+  variables: E I I_err N
+end data
+
+begin data
+  Date: Tue Mar  5 10:35:15 2024 (1709631315)
+  type: array_1d(2001)
+  Source: Test_Fluorescence (Test_Fluorescence.instr)
+  component: emon_Compton
+  position: 0 0 3.4
+  title: Energy monitor
+  Ncount: 1000000
+  filename: Compton.dat
+  statistics: X0=38.9954; dX=0.0291856;
+  signal: Min=0; Max=7.6268e-24; Mean=1.43756e-26;
+  values: 2.87656e-23 5.20311e-24 45
+  xvar: E
+  yvar: (I,I_err)
+  xlabel: Energy [keV]
+  ylabel: Intensity
+  xlimits: 0 46.8
+  variables: E I I_err N
+end data
+
+begin data
+  Date: Tue Mar  5 10:35:15 2024 (1709631315)
+  type: array_1d(2001)
+  Source: Test_Fluorescence (Test_Fluorescence.instr)
+  component: emon_Rayleigh
+  position: 0 0 3.5
+  title: Energy monitor
+  Ncount: 1000000
+  filename: Rayleigh.dat
+  statistics: X0=39.0001; dX=0.033058;
+  signal: Min=0; Max=4.70989e-16; Mean=1.07841e-18;
+  values: 2.15789e-15 2.2278e-16 97
+  xvar: E
+  yvar: (I,I_err)
+  xlabel: Energy [keV]
+  ylabel: Intensity
+  xlimits: 0 46.8
+  variables: E I I_err N
+end data
