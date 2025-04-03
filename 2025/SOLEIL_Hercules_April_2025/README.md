@@ -37,9 +37,9 @@ After e.g. 15-30s you should see an information page that indicates that your se
 
 ![DARTS session](doc/Fig-2-DARTS-starting-session.png "DARTS session")
 
-A Desktop is displayed shortly after the connection.
+A Desktop is displayed shortly after the connection. It provides plenty of software, not only McXtrace, but also Jupyter, Orange3/Quasar, Fastosh, Dioptas, Mantis-Xray, ab-initio/MD, PyMCA/Silx/PyFAI, Napari, etc.
 
-:warning: To find back an previously opened session, use the "Manage sessions" button on the right of the login -page..
+:warning: To find back an previously opened session, use the "Manage sessions" button on the right of the login-page.
 
 #### Prerequisite: Your own installation
 
