@@ -5,7 +5,7 @@ It will take place at [Synchrotron SOLEIL](https://www.synchrotron-soleil.fr/fr)
 
 ![Synchrotron SOLEIL](doc/quest-ce-que-soleil.jpg "synchrotron SOLEIL")
 
-<img src="https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fgithub.com%2Fmccode-dev%2FSchools%2Ftree%2Fmaster%2F2025%2FSOLEIL_Hercules_April_2025&chs=180x180&choe=UTF-8&chld=L|2" alt="qr code"><a href="fr.qr-code-generator.com/" border="0" style="cursor:default" rel="nofollow"></a>
+![QR code](doc/qr-code.png)
 
 ## Objectives
 
