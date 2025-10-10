@@ -1,0 +1,95 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Mads Bertelsen (mads.bertelsen@esss.se)
+* Date: 4/3 2019
+* Origin: European Spallation Source, DMSC
+* %INSTRUMENT_SITE: Templates
+*
+* Reference solution for exercise at McStas school
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* once your instrument is written and functional:
+* - replace INSTRUMENT_SITE entry above with your Institution name as a single word
+* - rename the instrument name after DEFINE INSTRUMENT below
+* - update the parameter help in the following Parameters section
+* - update the instrument description, and better add a usage example with a
+*     sensible parameter set.
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT reference(guide_length=1.0)
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+/* The Arm() class component defines reference points and orientations  */
+/* in 3D space. Every component instance must have a unique name. Here, */
+/* Origin is used. This Arm() component is set to define the origin of  */
+/* our global coordinate system (AT (0,0,0) ABSOLUTE). It may be used   */
+/* for further RELATIVE reference, Other useful keywords are : ROTATED  */
+/* EXTEND GROUP PREVIOUS. Also think about adding a neutron source !    */
+/* Progress_bar is an Arm displaying simulation progress.               */
+COMPONENT Origin = Progress_bar()
+  AT (0,0,0) ABSOLUTE
+
+// tof source
+COMPONENT source = Source_simple(
+  xwidth=0.1,yheight=0.1,
+  focus_xw=0.03,focus_yh=0.03,dist=2.0,
+  lambda0=5.0,dlambda=1.0)
+AT (0,0,0) RELATIVE Origin
+
+// guide starting 2 m after source
+COMPONENT guide = Guide_gravity(
+  w1=0.03,h1=0.03,
+  w2=0.03,h2=0.03,
+  l=guide_length,
+  R0=0.99,m=3,Qc=0.0217,alpha=2.0,W=0.003,
+  G=-9.82)
+AT (0,0,2) RELATIVE source
+
+// monitors
+// Position sensetive detector
+COMPONENT PSD_2D = PSD_monitor(
+  xwidth=0.05,nx=200,
+  yheight=0.05,ny=200,
+  filename="PSD_2D.dat",restore_neutron=1)
+AT (0,0,guide_length+0.1) RELATIVE guide
+
+// Divergence monitor
+COMPONENT DIV_2D = Divergence_monitor(
+  xwidth=0.05,nh=200,maxdiv_h=3.0,
+  yheight=0.05,nv=200,maxdiv_v=3.0,
+  filename="DIV_2D.dat",restore_neutron=1)
+AT (0,0,0) RELATIVE PREVIOUS
+
+// Wavelength monitor
+COMPONENT Wavelength_1D = L_monitor(
+  xwidth=0.05,yheight=0.05,
+  Lmin=1,Lmax=10,nL=100,
+  filename="Wavelength_1D.dat",restore_neutron=1)
+AT (0,0,0) RELATIVE PREVIOUS
+
+// Acceptance diagram
+COMPONENT POS_DIV_2D = DivPos_monitor(
+  xwidth=0.05,yheight=0.05,nh=200,
+  ndiv=200,maxdiv_h=3.0,
+  filename="POS_DIV_2D.dat",restore_neutron=1)
+AT (0,0,0) RELATIVE PREVIOUS
+
+/* The END token marks the instrument definition end */
+END

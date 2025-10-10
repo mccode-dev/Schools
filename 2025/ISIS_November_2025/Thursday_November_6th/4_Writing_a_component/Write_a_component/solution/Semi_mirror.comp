@@ -1,0 +1,72 @@
+/*******************************************************************************
+*
+* McStas, neutron ray-tracing package
+*         Copyright 1997-2002, All rights reserved
+*         Risoe National Laboratory, Roskilde, Denmark
+*         Institut Laue Langevin, Grenoble, France
+*
+* Component: Semi_mirror
+*
+* %I
+*
+* Written by: Erik B Knudsen
+* Date: April 2017
+* Version: $Revision$
+* Release: McStas 2.4
+* Origin: ISIS
+*
+* Semi-permeable mirror
+*
+* %D
+*
+* %P
+* Input parameters:
+*
+* (none)
+*
+* %E
+*******************************************************************************/
+
+DEFINE COMPONENT Semi_mirror
+DEFINITION PARAMETERS ()
+SETTING PARAMETERS (zdepth=0.1, yheight=0.1,reflectivity=0.9,fraction=0.5)
+OUTPUT PARAMETERS (internal_color)
+/* Neutron parameters: (x,y,z,vx,vy,vz,t,sx,sy,sz,p) */ 
+
+DECLARE
+%{
+  int internal_color;
+%}
+
+
+INITIALIZE
+%{
+  if(!zdepth || !yheight){
+    fprintf(stderr,"mirror has no area. Aborting\n");exit(-1);
+  }
+%}
+
+TRACE
+%{
+   PROP_X0;
+   internal_color=1;
+   if (z<zdepth/2.0 && z>-zdepth/2.0 && y<yheight/2.0 && y>-yheight/2.0){
+     internal_color=0;
+     double r=rand01();
+     if(r<=fraction){
+       p*=reflectivity/fraction;
+       vx=-vx;
+     }else{
+       p*=(1-reflectivity)/(1-fraction);
+     }
+   }
+%}
+
+MCDISPLAY
+%{
+  /* A bit ugly; hard-coded dimensions. */
+  magnify("");
+  rectangle("yz",0,0,0,yheight,zdepth);
+%}
+
+END

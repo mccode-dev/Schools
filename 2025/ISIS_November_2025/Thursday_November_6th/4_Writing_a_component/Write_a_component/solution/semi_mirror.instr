@@ -1,0 +1,85 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: semi-mirror test
+*
+* %Identification
+* Written by: me
+* Date: TODAY
+* Origin: here
+* Release: McStas 2.4pre1
+* Version: $Revision: 1.2 $
+* %INSTRUMENT_SITE: somewhere else
+*
+* Intrument template
+* 
+* %Description
+* %End
+*******************************************************************************/
+
+/* Change name of instrument and input parameters with default values */
+DEFINE INSTRUMENT intrument(TH=45)
+
+/* The DECLARE section allows us to declare variables or  small      */
+/* functions in C syntax. These may be used in the whole instrument. */
+DECLARE
+%{
+  int color;
+%}
+
+//SHARE
+//%{
+//%}
+
+/* The INITIALIZE section is executed when the simulation starts     */
+/* (C code). You may use them as component parameter values.         */
+INITIALIZE
+%{
+%}
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Source = Source_simple(
+    xwidth=0.3, yheight=0.3, dist=10, lambda0=5, dlambda=4, focus_xw=0.3, focus_yh=0.3
+)
+AT(0,0,0) RELATIVE Origin
+
+COMPONENT ref_pt=Arm()
+AT(0,0,10) RELATIVE Origin
+
+COMPONENT mirror = Semi_mirror(
+    zdepth=0.3,yheight=0.3,reflectivity=0.5,fraction=0.5)
+AT (0,0,0) RELATIVE ref_pt
+ROTATED (0,TH,0) RELATIVE ref_pt
+EXTEND
+%{
+    color=internal_color;
+%}
+
+COMPONENT rota=Arm()
+AT (0,0,0) RELATIVE mirror
+ROTATED (0,2*TH,0) RELATIVE Origin
+
+COMPONENT flat=PSD_monitor(xwidth=0.3,yheight=0.3,
+    nx=90, ny=90, filename="flat.psd")
+AT (0,0,1.0) RELATIVE ref_pt
+GROUP det_bank
+
+COMPONENT flat2=PSD_monitor(xwidth=0.3,yheight=0.3,
+    nx=90, ny=90, filename="flat2.psd")
+AT (0,0,1.0) RELATIVE rota
+GROUP det_bank
+
+/* This section is executed when the simulation ends (C code). Other    */
+/* optional sections are : SAVE                                         */
+FINALLY
+%{
+%}
+
+/* The END token marks the instrument definition end */
+END
