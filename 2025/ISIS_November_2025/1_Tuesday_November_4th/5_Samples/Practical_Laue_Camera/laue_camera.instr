@@ -1,0 +1,73 @@
+/*******************************************************************************
+* Instrument: laue_camera
+*
+* %I
+* Written by: Erik B Knudsen (erkn@fysik.dtu.dk)
+* Date: today
+* Origin: DTU Physics
+* %INSTRUMENT_SITE: Templates
+*
+* Super simple Laue Camera
+*
+* %D
+* The simplest conceivable Laue Camera 
+*
+* %P
+* Par1: [ ] Unused
+*
+* %L
+* <reference/HTML link>
+*
+* %E
+*******************************************************************************/
+DEFINE INSTRUMENT laue_camera(Par1=1)
+
+DECLARE
+%{
+%}
+
+INITIALIZE
+%{
+%}
+
+TRACE
+
+COMPONENT origin = Progress_bar()
+AT (0, 0, 0) RELATIVE ABSOLUTE
+
+// insert components here (e.g. Insert -> Source -> ...)
+COMPONENT source_simple = Source_simple(
+    radius=0.05, 
+    dist=5, 
+    focus_xw=0.02, 
+    focus_yh=0.05, 
+    lambda0=2, 
+    dlambda=1.9)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+COMPONENT guide = Guide(
+    w1=0.02, 
+    h1=0.05, 
+    w2=0.02, 
+    h2=0.05, 
+    l=20, 
+    m=1)
+AT (0, 0, 5) RELATIVE PREVIOUS
+
+COMPONENT single_crystal = Single_crystal( 
+	reflections="Al2O3_sapphire.lau", yheight=0.05, radius=0.01, mosaic=10, delta_d_d=1e-3, 
+	az=4.757, ay=0, az=0, bx=2.3785, by=0, bz=-3.364, cx=0, cy=12.9877, cz=0, p_transmit=0.1)
+AT (0, 0, 20) RELATIVE PREVIOUS
+
+COMPONENT beamstop = Beamstop(xwidth=0.025, yheight=0.055)
+  AT(0,0,0.1) RELATIVE single_crystal
+
+COMPONENT fourpi = PSD_monitor_4PI(
+	nx=201,ny=201, radius=1, filename="fpi.dat")
+AT(0,0,0) RELATIVE single_crystal
+
+FINALLY
+%{
+%}
+
+END
