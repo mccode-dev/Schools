@@ -1,0 +1,160 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: POWTOF_solution
+*
+* %Identification
+* Written by: Linda Udby udby@fys.ku.dk, modified by Mads Bertelsen mads.bertelsen@ess.eu
+* Date: June 6th 2011, Modified Jun 2022
+* Origin: University of Copenhagen
+* Release: McStas 3.1
+* Version: 0.2
+* %INSTRUMENT_SITE: ESS_thermal_powder
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* %Parameters
+* Par1: [unit] Parameter1 description
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+
+DEFINE INSTRUMENT POWTOF_solution(Lmin=0.5, Wavelength_band=4.5, npulses=1, string filename="Na2Ca3Al2F14.laz")
+
+/* The DECLARE section allows us to declare variables or  small      */
+/* functions in C syntax. These may be used in the whole instrument. */
+DECLARE
+%{
+int npulses_declare;
+double Lmax;
+double alpha = 252.7;
+
+double tmin1,tmin2,tmin3;
+double tmax1,tmax2,tmax3;
+double t_between_pulses=1.0/14.0;
+%}
+
+/* The INITIALIZE section is executed when the simulation starts     */
+/* (C code). You may use them as component parameter values.         */
+INITIALIZE
+%{
+npulses_declare=npulses;
+Lmax = Lmin + Wavelength_band;
+
+tmin1 = alpha * Lmin * 1e-3 - 100;
+tmax1 = alpha * Lmax * 1e-3 + 3000;
+ 
+tmin2 = alpha * Lmin * 6.5 - 1000;
+tmax2 = alpha * Lmax * 6.5 + 3000;
+
+tmin3 = alpha * Lmin * 160 - 2000;
+ tmax3 = alpha * Lmax * 160 + (4000+ t_between_pulses)*npulses;
+ 
+
+%}
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Source = Source_simple(
+  xwidth=0.03, yheight=0.03,
+  focus_xw=0.03, focus_yh=0.03, dist=160,
+  lambda0=Lmin + 0.5*Wavelength_band, dlambda=0.5*Wavelength_band, flux=1E13)
+AT (0,0,0) RELATIVE Origin
+EXTEND %{
+    double pulse_n=(double) floor(rand01()*npulses_declare);
+    double pulse_delay=t_between_pulses*pulse_n;
+    
+    t=2860*rand01()*1E-6 + pulse_delay; // Square time distribution centered at 1430 us
+%}
+
+COMPONENT TOFmon1 = TOF_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=100, tmin=tmin1, tmax=tmax1,
+  filename="TOFmon1", restore_neutron=1)
+AT (0, 0, 1e-3) RELATIVE Source
+
+COMPONENT TOFLambda1 = TOFLambda_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=200, tmin=tmin1, tmax=tmax1,
+  nL=100, Lmin=Lmin, Lmax=Lmax,
+  filename="TOFLambda1", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE TOFmon1
+
+
+COMPONENT TOFmon2 = TOF_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=100, tmin=tmin2, tmax=tmax2,
+  filename="TOFmon2", restore_neutron=1)
+AT (0, 0, 6.5) RELATIVE Source
+
+COMPONENT TOFLambda2 = TOFLambda_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=200, tmin=tmin2, tmax=tmax2,
+  nL=100, Lmin=Lmin, Lmax=Lmax,
+  filename="TOFLambda2", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE TOFmon2
+
+
+  
+COMPONENT TOFmon3 = TOF_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=100, tmin=tmin3, tmax=tmax3,
+  filename="TOFmon3", restore_neutron=1)
+AT (0, 0, 160) RELATIVE Source
+
+COMPONENT TOFLambda3 = TOFLambda_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=200, tmin=tmin3, tmax=tmax3,
+  nL=100, Lmin=Lmin, Lmax=Lmax,
+  filename="TOFLambda3", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE TOFmon3
+
+COMPONENT TOFLambda3all = TOFLambda_monitor(
+  xwidth=0.05, yheight=0.05,
+  nt=200, tmin=tmin3, tmax=1e6,
+  nL=100, Lmin=Lmin, Lmax=Lmax,
+  filename="TOFLambda3all", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE TOFLambda3
+
+COMPONENT sa_arm = Arm()
+AT (0, 0, 160) RELATIVE Source
+
+SPLIT 10 COMPONENT sample = PowderN (
+	d_phi=D_PHI,radius=0.006, yheight=0.01, DW=Dw, reflections = filename)
+AT ( 0, 0, 0) RELATIVE sa_arm
+
+COMPONENT STOP = Beamstop(radius=0.3)
+AT (0,0,1.4) RELATIVE sa_arm
+ROTATED (0,0,0) RELATIVE sa_arm
+
+
+COMPONENT Detector = Monitor_nD(
+  xwidth=4.0, yheight=0.09, filename="detector.dat",
+  options="banana, theta limits=[10 170] bins=320, t limits=[0 1] bins=10000")
+AT (0,0,0) RELATIVE sa_arm
+ROTATED (0, 0, 180) RELATIVE sa_arm
+
+
+
+
+/* This section is executed when the simulation ends (C code). Other    */
+/* optional sections are : SAVE                                         */
+FINALLY
+%{
+%}
+/* The END token marks the instrument definition end */
+END
+

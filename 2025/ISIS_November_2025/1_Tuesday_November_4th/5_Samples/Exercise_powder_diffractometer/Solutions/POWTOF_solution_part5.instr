@@ -1,0 +1,173 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: POWTOF_solution
+*
+* %Identification
+* Written by: Linda Udby udby@fys.ku.dk, modified by Mads Bertelsen mads.bertelsen@ess.eu
+* Date: June 6th 2011, Modified Jun 2022
+* Origin: University of Copenhagen
+* Release: McStas 3.1
+* Version: 0.2
+* %INSTRUMENT_SITE: ESS_thermal_powder
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* %Parameters
+* Par1: [unit] Parameter1 description
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+
+DEFINE INSTRUMENT POWTOF_solution(Lmin=0.5, Wavelength_band=4.5, two_theta=90, npulses=1)
+
+/* The DECLARE section allows us to declare variables or  small      */
+/* functions in C syntax. These may be used in the whole instrument. */
+DECLARE
+%{
+int npulses_declare;
+double Lmax;
+double Lcenter;
+double speed;
+double delay;
+%}
+
+/* The INITIALIZE section is executed when the simulation starts     */
+/* (C code). You may use them as component parameter values.         */
+INITIALIZE
+%{
+npulses_declare=npulses;
+Lmax = Lmin + Wavelength_band;
+    
+// Calculate delay
+Lcenter = Lmin + 0.5*Wavelength_band; // Mid point for wavelength band
+speed = 2*PI/Lcenter*K2V; // Speed of neutrons in center of band
+delay = 6.5/speed; // Delay from t=0 to center of wavelength band reaches 6.5 m
+delay = delay + 1.340E-3; // Reset t_0 to center of pulse
+%}
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Source = Source_simple(
+  xwidth=0.03, yheight=0.03,
+  focus_xw=0.03, focus_yh=0.03, dist=160,
+  lambda0=Lmin + 0.5*Wavelength_band, dlambda=0.5*Wavelength_band, flux=1E13)
+AT (0,0,0) RELATIVE Origin
+EXTEND %{
+    double t_between_pulses=1.0/14.0;
+    double pulse_n=(double) floor(rand01()*npulses_declare);
+    double pulse_delay=t_between_pulses*pulse_n;
+    
+    t=2860*rand01()*1E-6 + pulse_delay; // Square time distribution centered at 1430 us
+%}
+
+COMPONENT TOFmon1 = TOF_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=100, tmin=0, tmax=5000,
+  filename="TOFmon1", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE Source
+
+COMPONENT TOFLambda1 = TOFLambda_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=200, tmin=0, tmax=5000,
+  nL=100, Lmin=0.1, Lmax=5,
+  filename="TOFLambda1", restore_neutron=1)
+AT (0, 0, 1e-6) RELATIVE Source
+
+
+COMPONENT PSD = PSD_monitor(
+    filename="PSD", xwidth=0.03, yheight=0.03)
+AT (0, 0, 0.5) RELATIVE Source
+
+COMPONENT chopper = DiskChopper(
+  radius=0.35, yheight=0.03, theta_0=4.0,
+  nu=2*14.0, delay=delay)
+AT (0, 0, 6.49) RELATIVE Source
+
+COMPONENT counter_chopper = DiskChopper(
+  radius=0.35, yheight=0.03, theta_0=4.0,
+  nu=-2*14.0, delay=delay)
+AT (0, 0, 6.495) RELATIVE Source
+
+COMPONENT TOFmon2 = TOF_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=100, tmin=0, tmax=12000,
+  filename="TOFmon2", restore_neutron=1)
+AT (0, 0, 6.5) RELATIVE Source
+
+COMPONENT TOFLambda2 = TOFLambda_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=200, tmin=0, tmax=12000,
+  nL=100, Lmin=0.1, Lmax=5,
+  filename="TOFLambda2", restore_neutron=1)
+AT (0, 0, 6.5) RELATIVE Source
+
+
+COMPONENT TOFmon3 = TOF_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=200, tmin=0, tmax=220000,
+  filename="TOFmon3", restore_neutron=1)
+AT (0, 0, 160) RELATIVE Source
+
+COMPONENT TOFLambda3 = TOFLambda_monitor(
+  xwidth=0.02, yheight=0.02,
+  nt=200, tmin=0, tmax=220000,
+  nL=100, Lmin=0.1, Lmax=5,
+  filename="TOFLambda3", restore_neutron=1)
+AT (0, 0, 160) RELATIVE Source
+
+
+COMPONENT Sample = Powder1(
+  radius=0.003, yheight=0.02, q=5, d_phi=12)
+AT (0, 0, 160) RELATIVE Source
+
+COMPONENT beamstop = Beamstop(
+  radius=0.2)
+AT (0, 0, 0.5) RELATIVE Sample
+
+
+COMPONENT TOF_cylPSD = TOF_cylPSD_monitor(
+  radius=2.0, yheight=0.20, nphi=180,
+  nt=100, tmin=0, tmax=100000,
+  filename="TOF_cylPSD", restore_neutron=1)
+AT (0, 0, 0) RELATIVE Sample
+
+COMPONENT TOFdetArm = Arm()
+AT (0, 0, 0) RELATIVE Sample
+ROTATED (0,two_theta,0) RELATIVE Sample
+
+COMPONENT TOFdet = TOF_monitor(
+  xwidth=0.01, yheight=0.2,
+  tmin=70000, tmax=80000, nt=100,
+  filename="TOFdet", restore_neutron=1)
+AT (0, 0, 2.001) RELATIVE TOFdetArm
+	
+
+/* This section is executed when the simulation ends (C code). Other    */
+/* optional sections are : SAVE                                         */
+FINALLY
+%{
+%}
+/* The END token marks the instrument definition end */
+END
+
+
+
+
+
+
+
+
