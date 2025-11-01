@@ -1,6 +1,6 @@
 # Recipe for writing a perfect mirror
 
-* Copy the enclosed` [``Arm.comp```](Arm.comp) to the local workdir, rename to ```Mirror_simple.comp```
+* Copy the enclosed [```Arm.comp```](Arm.comp) to the local workdir, rename to ```Mirror_simple.comp```
 * Edit the file changing all instances of Arm to Mirror_simple
 * Add ```SETTING PARAMETERS``` for geometry, e.g. ```yheight``` and ```zlength```
 * In ```INITIALIZE``` check that the new parameters are > 0
