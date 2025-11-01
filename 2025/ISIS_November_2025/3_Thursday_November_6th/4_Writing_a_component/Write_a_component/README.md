@@ -1,6 +1,6 @@
 # Recipe for writing a perfect mirror
 
-* Copy ```Arm.comp``` from ```$MCSTAS/optics``` to the local workdir, rename to ```Mirror_simple.comp```
+* Copy the enclosed` [``Arm.comp```](Arm.comp) to the local workdir, rename to ```Mirror_simple.comp```
 * Edit the file changing all instances of Arm to Mirror_simple
 * Add ```SETTING PARAMETERS``` for geometry, e.g. ```yheight``` and ```zlength```
 * In ```INITIALIZE``` check that the new parameters are > 0
@@ -17,3 +17,4 @@
    1. two detectors - one catching the reflected beam, one catching the trasnmitted
 * Try out your mirror to confirm the it works.
 * Add another  ```SETTING PARAMETERS```: fraction. We will use this to govern Monte Carlo statistics in the reflected and transmitted branches.
+1
