@@ -1,0 +1,68 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Anders Markvardsen and Peter Willendrup
+* Date: 201x
+* Origin: ISIS
+* %INSTRUMENT_SITE: Mantid
+*
+* Instrument demonstrating how to bring multiple scattering information from
+* a McStas simulation to Mantid (using NeXus output).
+*
+* %Description
+* Instrument demonstrating how to bring multiple scattering information from
+* a McStas simulation to Mantid (using NeXus output).
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+
+DEFINE INSTRUMENT templateVanadiumMultipleScat_Mantid()
+DEPENDENCY " @NEXUSFLAGS@ "
+
+USERVARS
+%{
+int multi_flag;
+int single_flag;
+%}
+
+TRACE
+
+COMPONENT Origin = Progress_bar(percent=5)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sourceMantid = Source_simple(radius=0.001, dist=1,
+		focus_xw=0.001, focus_yh=0.001, E0=5, dE=0.01)
+  AT (0, 0, 0) RELATIVE Origin
+
+COMPONENT sampleMantid = Incoherent(radius=0.002,
+		yheight=0.015, focus_r=0, pack=1, target_x=0,
+		target_y=0, target_z=1, f_QE=0, gamma=0)
+  AT (0, 0, 1) RELATIVE sourceMantid
+EXTEND
+%{
+if (SCATTERED == 1) single_flag =1 ;
+if (SCATTERED > 1) multi_flag =1 ;
+%}
+
+COMPONENT nD_Mantid_0 = Monitor_nD(
+    options ="Mantid square, x limits=[-2.5 2.5] bins=50 y limits=[-2.5 2.5] bins=50, neutron pixel min=0 t limits [0.002,0.005] list all neutrons, file=multi",
+    xwidth = 5, yheight = 5, restore_neutron = 1)
+  WHEN (multi_flag ==1)
+  AT (0, 0, 1) RELATIVE sampleMantid
+
+
+COMPONENT Mantid_1 = Monitor_nD(
+    options ="square, x limits=[-2.5 2.5] bins=50 y limits=[-2.5 2.5] bins=50, neutron pixel min=0 t limits [0.002,0.005] list all neutrons, file=single",
+    xwidth = 5, yheight = 5, restore_neutron = 1)
+  WHEN (single_flag ==1)
+  AT (0, 0, 1) RELATIVE sampleMantid
+  
+END
