@@ -1,0 +1,250 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: Guide_BT_template
+*
+* %Identification
+* Written by: Mads Bertelsen (mads.bertelsen@ess.eu)
+* Date: November 2025
+* Origin: ESS
+* %INSTRUMENT_SITE: Templates
+*
+* Template for doing brilliance transfer calculation
+*
+* %Description
+* Template for brilliance transfer with several typical monitors
+* The results can be normalized by dividing bin for bin the sample monitors
+* with the source monitors.
+*
+* Example: mcrun Guide_BT_template.instr
+*
+*
+* %Parameters
+* sample_width: [m] width of sample
+* sample_height: [m] height of sample
+* horizontal_divergence: [deg] maximum divergence requested in horizontal direction, half of full beam divergence
+* vertical_divergence: [deg] maximum divergence requested in vertical direction, half of full beam divergence
+* minimum_wavelength: [Å] lowest wavelength investigated
+* maximum_wavelength: [Å] highest wavelength investigated
+*
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT Guide_BT_template(sample_width=0.01, sample_height=0.01,
+                                horizontal_divergence=0.8, vertical_divergence=1.0,
+						        minimum_wavelength=1.5, maximum_wavelength=5.0)
+
+/* The DECLARE section allows us to declare variables or  small      */
+/* functions in C syntax. These may be used in the whole instrument. */
+DECLARE
+%{
+%}
+
+USERVARS
+%{
+// Variables calculated for each ray and available throughout the instrument
+int ray_within_h_div;
+int ray_within_v_div;
+int ray_within_wave;
+%}
+
+/* The INITIALIZE section is executed when the simulation starts     */
+/* (C code). You may use them as component parameter values.         */
+INITIALIZE
+%{
+%}
+
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+
+COMPONENT Origin = Progress_bar()
+  AT (0,0,0) ABSOLUTE
+	  
+COMPONENT source = Source_div(
+	  xwidth=0.1, yheight=0.06,
+      focus_aw=4.0*horizontal_divergence, focus_ah=4.0*vertical_divergence,
+	  lambda0=0.5*(minimum_wavelength + maximum_wavelength),
+	  dlambda=0.5*(maximum_wavelength - minimum_wavelength)
+	  )
+AT (0,0,0) RELATIVE Origin
+			  
+
+// Reference monitors, somewhere between source and guide opening, fully illuminated
+COMPONENT initial_state_calculator = Slit(xwidth=1.0, yheight=1.0)
+AT (0, 0, 0.1) RELATIVE source
+EXTEND %{
+	// Calculates divergence and wavelength
+	double ray_h_div = 180/PI*atan(vx/vz);
+	double ray_v_div = 180/PI*atan(vy/vz);	
+	double ray_wavelength = 2.0*PI / (sqrt(vx*vx+vy*vy+vz*vz)*V2K);
+	
+	// Grabs the instrument parameters
+	double horizontal_divergence = INSTRUMENT_GETPAR(horizontal_divergence);
+	double vertical_divergence = INSTRUMENT_GETPAR(vertical_divergence);
+	double minimum_wavelength = INSTRUMENT_GETPAR(minimum_wavelength);
+	double maximum_wavelength = INSTRUMENT_GETPAR(maximum_wavelength);			
+	
+	// Check if ray is within divergence and wavelength limits
+	if (fabs(ray_h_div) <= horizontal_divergence) ray_within_h_div = 1;
+	else ray_within_h_div = 0;
+	
+	if (fabs(ray_v_div) <= vertical_divergence) ray_within_v_div = 1;
+	else ray_within_v_div = 0;
+	
+	if (ray_wavelength <= maximum_wavelength && ray_wavelength >= minimum_wavelength)
+		ray_within_wave = 1;
+	else ray_within_wave = 0;
+%} 
+
+//COMPONENT PSD_monitor_reference = PSD_monitor(¨
+COMPONENT PSD_monitor_source = PSD_monitor(
+    nx=100, xwidth=sample_width,
+    ny=100, yheight=sample_height,
+	filename="PSD_ref.dat", restore_neutron=1)
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE initial_state_calculator
+		
+COMPONENT wave_source = L_monitor(
+  nL = 100,
+  filename = "lambda_source.dat",
+  xwidth = sample_width,
+  yheight = sample_height,
+  Lmin = minimum_wavelength,
+  Lmax = maximum_wavelength,
+  restore_neutron = 1) 
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)	  
+ AT (0, 0, 0) RELATIVE  PREVIOUS
+	   
+COMPONENT psd_h_source = PSDlin_monitor(
+  nbins = 100,
+  filename = "psd_h_lin_source.dat",
+  xwidth = 2.0*sample_width,
+  yheight = sample_height,
+  restore_neutron = 1,
+  vertical = 0) 
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0, 0, 0) RELATIVE  PREVIOUS
+
+COMPONENT psd_v_source = PSDlin_monitor(
+  nbins = 100,
+  filename = "psd_v_lin_source.dat",
+  xwidth = sample_width,
+  yheight = 2.0*sample_height,
+  restore_neutron = 1,
+  vertical = 1) 
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0, 0, 0) RELATIVE  PREVIOUS
+			  
+COMPONENT div_1d_h_source = Div1D_monitor(
+  ndiv = 100,
+  filename = "h_div_source.dat",
+  xwidth = sample_width,
+  yheight = sample_height,
+  maxdiv = 2.0*horizontal_divergence,
+  restore_neutron = 1,
+  vertical = 0) 
+WHEN (ray_within_v_div && ray_within_wave)
+AT (0, 0, 0) RELATIVE  PREVIOUS
+
+COMPONENT div_1d_v_source = Div1D_monitor(
+  ndiv = 100,
+  filename = "v_div_source.dat",
+  xwidth = sample_width,
+  yheight = sample_height,
+  maxdiv = 2.0*vertical_divergence,
+  restore_neutron = 1,
+  vertical = 1) 
+WHEN (ray_within_h_div && ray_within_wave)
+AT (0, 0, 0) RELATIVE  PREVIOUS
+
+COMPONENT Div2D_monitor_source = Divergence_monitor(
+  nh=100, maxdiv_h=2.0*horizontal_divergence,
+  nv=100, maxdiv_v=2.0*vertical_divergence,
+  xwidth=sample_width, yheight=sample_height,
+  filename="divergence_2D.dat", restore_neutron=1)
+WHEN (ray_within_wave)
+AT (0,0,0) RELATIVE initial_state_calculator
+		  
+// Guide
+// Experiment with different guide geometries, coatings and so forth
+// Use instrument parameters to control interesting parameters directly
+	  
+// Simple straight guide 
+COMPONENT guide = Guide_gravity(
+	w1=0.04, h1=0.04, m=3, alpha=3.0, l=10)
+AT (0,0,1.5) RELATIVE source
+
+COMPONENT guide_end = Arm()
+AT (0, 0, 10) RELATIVE guide
+			
+COMPONENT sample_position = Arm()
+AT (0, 0, 0.6) RELATIVE guide_end
+
+// Check if ray is within phase-space limits
+COMPONENT sample_state_calculator = Slit(xwidth=1.0, yheight=1.0)
+AT (0, 0, 0) RELATIVE sample_position
+EXTEND %{
+	// Calculates divergence and wavelength
+	double ray_h_div = 180/PI*atan(vx/vz);
+	double ray_v_div = 180/PI*atan(vy/vz);	
+	double ray_wavelength = 2.0*PI / (sqrt(vx*vx+vy*vy+vz*vz)*V2K);
+	
+	// Grabs the instrument parameters
+	double horizontal_divergence = INSTRUMENT_GETPAR(horizontal_divergence);
+	double vertical_divergence = INSTRUMENT_GETPAR(vertical_divergence);
+	double minimum_wavelength = INSTRUMENT_GETPAR(minimum_wavelength);
+	double maximum_wavelength = INSTRUMENT_GETPAR(maximum_wavelength);			
+	
+	// Check if ray is within divergence and wavelength limits
+	if (fabs(ray_h_div) <= horizontal_divergence) ray_within_h_div = 1;
+	else ray_within_h_div = 0;
+	
+	if (fabs(ray_v_div) <= vertical_divergence) ray_within_v_div = 1;
+	else ray_within_v_div = 0;
+	
+	if (ray_wavelength <= maximum_wavelength && ray_wavelength >= minimum_wavelength)
+		ray_within_wave = 1;
+	else ray_within_wave = 0;
+%} 
+
+// Copies of monitors at source placed at sample position instead
+COMPONENT PSD_monitor_sample = COPY(PSD_monitor_source)(filename="PSD_sample.dat")
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+			  
+COMPONENT wave_sample = COPY(wave_source)(filename="wave_sample.dat")
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+
+COMPONENT psd_h_sample = COPY(psd_h_source)(filename="psd_h_sample.dat")
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+
+COMPONENT psd_v_sample = COPY(psd_v_source)(filename="psd_v_sample.dat")
+WHEN (ray_within_h_div && ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+
+COMPONENT div_1d_h_sample = COPY(div_1d_h_source)(filename="div_1d_h_sample.dat")
+WHEN (ray_within_v_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+
+COMPONENT div_1d_v_sample = COPY(div_1d_v_source)(filename="div_1d_v_sample.dat")
+WHEN (ray_within_h_div && ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+
+COMPONENT Div2D_monitor_sample = COPY(Div2D_monitor_source)(filename="divergence_2d_sample.dat")
+WHEN (ray_within_wave)
+AT (0,0,0) RELATIVE sample_state_calculator
+			  
+
+/* This section is executed when the simulation ends (C code). Other    */
+/* optional sections are : SAVE                                         */
+FINALLY
+%{
+%}
+/* The END token marks the instrument definition end */
+END
+
