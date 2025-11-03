@@ -1,0 +1,165 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: Template monochromator Diffractometer
+*
+* %Identification
+* Written by: Mads Bertelsen
+* Date: November 2025
+* Origin: ESS
+* %INSTRUMENT_SITE: Union_demos
+*
+* Example instrument to play with Union components
+*
+* %Description
+* List of materials defined, just add geoemtry components to make a simulated system.
+* The input parameters describe the size of the made object for the purpose of sizing
+* monitors appropriately.
+*
+* Materials: Al, Ni, Bi, Air
+*
+*
+* %Parameters
+* object_width: [m]  Width of object seen by monitors (around center)
+* object_height: [m]  Height of object seen by monitors (around center)
+* object_depth: [m]  Depth of object seen by monitors (around center)
+* minimum_wavelength: [Angs] Lowest simulated wavelength
+* maximum_wavelength: [Angs] Highest simulated wavelength
+*
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT templateDIFF(object_width=0.1, object_height=0.1, object_depth=0.1,
+                               minimum_wavelength=1.0, maximum_wavelength=3.0)
+
+DECLARE %{
+
+%}
+
+/* The INITIALIZE section is executed when the simulation starts     */
+/* (C code). You may use them as component parameter values.         */
+INITIALIZE
+%{
+%}
+
+/* Here comes the TRACE section, where the actual      */
+/* instrument is defined as a sequence of components.  */
+TRACE
+
+// For technical reasons, a Union_init component called init is needed in McStas 3.X	
+COMPONENT init = Union_init()
+AT (0,0,0) ABSOLUTE
+	
+// Union processes and materials 
+COMPONENT Al_incoherent = Incoherent_process(
+  sigma=4*0.0082, unit_cell_volume=66.4)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Al_powder = Powder_process(
+  reflections="Al.laz")
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Al = Union_make_material(
+  my_absorption=100*4*0.231/66.4, // 100: barns^2 to AA^3, 4: atoms per unit cell, 0.231 abs per atom [barns], 66.4 unit cell volume [AA]
+  refraction_SLD = 2.07741E-06, // [AA^-2]
+  process_string="Al_incoherent,Al_powder" // Names of processes to be included in this material
+  )
+AT (0,0,0) ABSOLUTE
+
+// NCrystal materials imported
+COMPONENT Ni_process = NCrystal_process(
+  cfg = "Ni_sg225.ncmat;temp=10C")
+AT (0,0,0) ABSOLUTE
+
+COMPONENT Ni = Union_make_material(
+  process_string = "Ni_process",
+  my_absorption = 41.0437,
+  refraction_SLD = 9.41537E-06)
+AT (0,0,0) ABSOLUTE
+	 
+COMPONENT Bi_process = NCrystal_process(
+  cfg = "Bi_sg166.ncmat;dir1=@crys_hkl:2,-1,0@lab:0,0,1;dir2=@crys_hkl:0,0,1@lab:1,0,0;mos=20.0arcmin;temp=10C")
+  AT (0,0,0) ABSOLUTE
+ROTATED (0,0,0) ABSOLUTE
+
+COMPONENT Bi = Union_make_material(
+  process_string = "Bi_process", my_absorption = 0.0955258,
+  refraction_SLD = 2.41132E-06)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT air_process = NCrystal_process(
+  cfg = "gasmix::air/25C/1.0atm/0.30relhumidity")
+AT (0,0,0) ABSOLUTE
+
+COMPONENT air = Union_make_material(
+  process_string = "air_process", 
+  my_absorption = 0.00726555,
+  refraction_SLD = 4.15904E-09)
+AT (0,0,0) ABSOLUTE
+		 
+// Surface definitions
+COMPONENT mirror = Mirror_surface(m = 4, alpha = 3.5)
+AT (0,0,0) ABSOLUTE
+
+
+// Instrument 
+REMOVABLE COMPONENT Origin = Progress_bar()
+  AT (0,0,0) ABSOLUTE
+
+COMPONENT Source = Source_simple(
+  xwidth = 0.08, yheight = 0.04, 	flux=1E15,
+  dist = 5, focus_xw = 1.1*object_width, focus_yh = 1.1*object_height,
+  lambda0 =  0.5*(maximum_wavelength + minimum_wavelength),
+  dlambda = 0.5*(maximum_wavelength - minimum_wavelength))
+AT (0, 0, 0) RELATIVE Origin
+
+// Center of geometry
+COMPONENT Center = Arm()
+AT (0,0,5) RELATIVE Source
+
+// Place Union geometry components here
+// Union_sphere, Union_cylinder, Union_cone, Union_box		
+
+COMPONENT center_sphere = Union_sphere(
+  radius=0.01, material_string="Al", priority=100)
+AT (0,0,0) RELATIVE Center
+				
+
+// Logger that shows scattering in zx plane
+COMPONENT Union_logger_2D_space_zx = Union_abs_logger_2D_space(
+  D_direction_1="z", D1_min=-object_depth/2, D1_max=object_depth/2, n1=250,
+  D_direction_2="x", D2_min=-object_width/2, D2_max=object_width/2, n2=250,
+  filename="Union_logger_2D_space_zx.dat")
+AT (0,0,0) RELATIVE Center
+				
+// Logger that shows absorption in zx plane
+COMPONENT Union_abs_logger_2D_space_zx = Union_abs_logger_2D_space(
+  D_direction_1="z", D1_min=-object_depth/2, D1_max=object_depth/2, n1=250,
+  D_direction_2="x", D2_min=-object_width/2, D2_max=object_width/2, n2=250,
+  filename="Union_abs_logger_2D_space_zx.dat")
+AT (0,0,0) RELATIVE Center
+
+// Only the Union_master component actually performs simulation
+COMPONENT master = Union_master()
+AT (0,0,0) RELATIVE Center
+
+// Monitors
+COMPONENT Diff_BananaTheta = Monitor_nD(
+    options = "banana, theta limits=[-30 170], bins=340 y bins=100",
+    radius = 2.0, yheight = 0.8, restore_neutron=1)
+  AT (0, 0, 0) RELATIVE Center
+		
+COMPONENT transmission_monitor = PSD_monitor(
+  xwidth=1.1*object_width, nx=300,
+  yheight=1.1*object_height, ny=300,
+  filename="transmission.dat", restore_neutron=1)
+AT (0,0,0.6*object_depth) RELATIVE Center
+	  
+
+// For technical reasons, a Union_stop is needed in McStas 3.X (after all other Union components)
+COMPONENT stop = Union_stop()
+AT (0,0,0) ABSOLUTE
+			  
+
+/* The END token marks the instrument definition end */
+END
