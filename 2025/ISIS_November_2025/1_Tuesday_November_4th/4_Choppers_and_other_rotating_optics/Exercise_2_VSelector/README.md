@@ -1,6 +1,5 @@
 ### TASK2 - Velocity_selector
-Replace the higher order suppressing chopper with a velocity selector which only
-allows the desired wavelength through.
+Replace the chopper with a velocity selector which only
 
 ### HINTS
 * ```mcdoc V_selector```

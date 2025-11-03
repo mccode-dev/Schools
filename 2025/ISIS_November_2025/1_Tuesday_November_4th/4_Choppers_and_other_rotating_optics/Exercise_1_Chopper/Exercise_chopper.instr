@@ -24,6 +24,9 @@
 *     sensible parameter set.
 *
 * %Parameters
+* Lmin_src:   [AA] Minimum wavelength produced at source
+* Lmax_src:   [AA] Maximum wavelength produced at source 
+* L_target:   [AA] Target wavelength for optic 
 *
 * %Link
 * A reference/HTML link for more information

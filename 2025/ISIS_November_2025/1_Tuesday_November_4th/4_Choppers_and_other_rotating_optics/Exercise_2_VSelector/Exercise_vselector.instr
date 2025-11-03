@@ -24,13 +24,16 @@
 *     sensible parameter set.
 *
 * %Parameters
+* Lmin_src:   [AA] Minimum wavelength produced at source
+* Lmax_src:   [AA] Maximum wavelength produced at source 
+* L_target:   [AA] Target wavelength for optic 
 *
 * %Link
 * A reference/HTML link for more information
 *
 * %End
 *******************************************************************************/
-DEFINE INSTRUMENT reference(guide_length=3,wavelength=3)
+DEFINE INSTRUMENT reference(Lmin_src=0.1, Lmax_src=10, L_target=3)
 
 /* The DECLARE section allows us to declare variables or  small      */
 /* functions in C syntax. These may be used in the whole instrument. */
@@ -40,23 +43,27 @@ double wavevector;
 double source_chopper_distance=4.5; // Distance from source to chopper
 double vselector_angular_frequency;
 double chopper_delay;
+double guide_length=3;
 %}
 
 /* The INITIALIZE section is executed when the simulation starts     */
 /* (C code). You may use them as component parameter values.         */
 INITIALIZE
 %{
+wavevector = 2.0*PI/L_target;
 
-wavevector = 2.0*PI/wavelength;
-
-//calculate the required velocity selector frequency to allow the desired 
-// wavelength through.
-// The frequency is  given by nu = h/m_n * alpha/(2*pi*lambda*L)
-vselector_angular_frequency=3956* 48.298*DEG2RAD /(2*PI*wavelength*0.25);
+// calculate the required velocity selector frequency to allow transport
+// of the desired wavelength.
+// 
+// The frequency is given by nu = h/m_n * alpha/(2*pi*lambda*L)
+//
+// Use and assign this variable, making use of the V_selector mcdoc page:
+// vselector_angular_frequency=... ;
 
 // Calculate the arrival time of the desired neutrons at the chopper.
 // Use the built in conversion factor K2V from wavevector to velocity.
 //  t = s/v
+// assign to variable chopper_delay:
 chopper_delay = source_chopper_distance/(wavevector*K2V);
 
 %}
@@ -79,22 +86,27 @@ COMPONENT Origin = Progress_bar()
 COMPONENT source = Source_simple(
   xwidth=0.1,yheight=0.1,
   focus_xw=0.03,focus_yh=0.05,dist=2.0,
-  lambda0=wavelength*0.6,dlambda=wavelength*0.45)
+  lambda0=(Lmax_src+Lmin_src)/2,dlambda=(Lmax_src-Lmin_src)/2)
 AT (0,0,0) RELATIVE Origin
+EXTEND
+%{
+  // t=0 init not actually required, but put explicitly to illustrate that
+  // the McStas "steady state sources" actually behave like Dirac delta
+  // pulsed sources by default.
+  t=0;
+%}
 
 // guide starting 2 m after source
 COMPONENT guide = Guide_gravity(
   w1=0.03,h1=0.05,
   w2=0.03,h2=0.05,
-  l=source_chopper_distance-2.0-0.2,
+  l=source_chopper_distance-2.0-0.05, // <-- modify for placement of V_selector that needs more space!
   R0=0.99,m=3,Qc=0.0217,alpha=2.0,W=0.003,
   G=-9.82)
 AT (0,0,2) RELATIVE source
 
-COMPONENT velocity_selector = V_selector(
-    nslit=72, xwidth=0.03, yheight=0.05, zdepth=0.30, 
-    radius=0.12, alpha=48.298, length=0.25, d=0.0004, nu=vselector_angular_frequency, nslit=72
-)
+// V-selector goes in place of this Arm:
+COMPONENT velocity_selector = Arm()
 AT(0,0,source_chopper_distance) RELATIVE source
 
 COMPONENT guide2 = Guide_gravity(
@@ -103,10 +115,10 @@ COMPONENT guide2 = Guide_gravity(
   l=guide_length - source_chopper_distance + 2.0 - 0.1,
   R0=0.99,m=3,Qc=0.0217,alpha=2.0,W=0.003,
   G=-9.82)
-AT (0,0,source_chopper_distance - 2.0 + 0.2) RELATIVE guide
+AT (0,0,source_chopper_distance - 2.0 + 0.2) RELATIVE guide // <-- modify for placement of V_selector that needs more space!
 
 // monitors
-// Position sensetive detector
+// Position sensitive detector
 COMPONENT PSD_2D = PSD_monitor(
   xwidth=0.05,nx=200,
   yheight=0.05,ny=200,
@@ -123,15 +135,8 @@ AT (0,0,0) RELATIVE PREVIOUS
 // Wavelength monitor
 COMPONENT Wavelength_1D = L_monitor(
   xwidth=0.05,yheight=0.05,
-  Lmin=wavelength*0.1,Lmax=wavelength*1.1,nL=600,
+  Lmin=Lmin_src,Lmax=Lmax_src,nL=600,
   filename="Wavelength_1D.dat",restore_neutron=1)
-AT (0,0,0) RELATIVE PREVIOUS
-
-// Acceptance diagram
-COMPONENT POS_DIV_2D = DivPos_monitor(
-  xwidth=0.05,yheight=0.05,nh=200,
-  ndiv=200,maxdiv_h=3.0,
-  filename="POS_DIV_2D.dat",restore_neutron=1)
 AT (0,0,0) RELATIVE PREVIOUS
 
 /* The END token marks the instrument definition end */
