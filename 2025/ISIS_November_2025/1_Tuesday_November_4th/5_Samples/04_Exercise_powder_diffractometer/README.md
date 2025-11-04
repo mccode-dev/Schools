@@ -6,7 +6,7 @@ In a diffractometer it is assumed that all scattering is elastic, meaning the sp
 
 $$t=\alpha \lambda L$$
 
-Where $ \alpha $ is a constant,    $\alpha = m_n/h \approx 252.7 \mu \textrm{~s/m/Å.} $
+Where $\alpha$ is a constant,    $\alpha = m_n/h \approx 252.7 \mu \textrm{~s/m/Å.} $
 The scattering vector can then be calculated using:
 
 $$q = 2k_i \text{sin}(\theta) = \frac{4\pi}{\lambda}\text{sin}(\theta)$$
