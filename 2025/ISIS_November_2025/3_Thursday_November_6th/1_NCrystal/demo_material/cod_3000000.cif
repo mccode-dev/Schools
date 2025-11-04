@@ -1,0 +1,173 @@
+#------------------------------------------------------------------------------
+#$Date: 2023-03-26 11:09:57 +0300 (Sun, 26 Mar 2023) $
+#$Revision: 282068 $
+#$URL: file:///home/coder/svn-repositories/cod/cif/3/00/00/3000000.cif $
+#------------------------------------------------------------------------------
+#
+# This file is available in the Crystallography Open Database (COD),
+# http://www.crystallography.net/
+#
+# All data on this site have been placed in the public domain by the
+# contributors.
+#
+data_3000000
+loop_
+_publ_author_name
+'Armel Le Bail'
+'Salim Ouhenia'
+'Daniel Chateigner'
+_publ_section_title
+;
+ Microtwinning hypothesis for a more ordered vaterite model
+;
+_journal_name_full               'Powder Diffraction'
+_journal_page_first              16
+_journal_page_last               21
+_journal_paper_doi               10.1154/1.3552994
+_journal_volume                  26
+_journal_year                    2011
+_chemical_compound_source        Synthetic
+_chemical_formula_sum            'C Ca O3'
+_chemical_name_mineral           Vaterite
+_space_group_IT_number           40
+_symmetry_cell_setting           orthorhombic
+_symmetry_space_group_name_Hall  'A 2 -2a'
+_symmetry_space_group_name_H-M   'A m a 2'
+_cell_angle_alpha                90.00000
+_cell_angle_beta                 90.00000
+_cell_angle_gamma                90.00000
+_cell_formula_units_Z            4
+_cell_length_a                   8.4721(5)
+_cell_length_b                   7.1575(7)
+_cell_length_c                   4.1265(4)
+_cell_measurement_temperature    293
+_cell_volume                     250.23(4)
+_computing_structure_refinement  FULLPROF
+_computing_structure_solution    ESPOIR
+_database_code_amcsd             0019019
+_diffrn_radiation_monochromator  graphite
+_diffrn_radiation_type           X-ray
+_diffrn_source                   'X-ray tube'
+_diffrn_source_target            Cu
+_exptl_crystal_density_diffrn    2.657
+_pd_meas_2theta_range_inc        0.016711
+_pd_meas_2theta_range_max        120.00000
+_pd_meas_2theta_range_min        15.00000
+_pd_meas_number_of_points        6284
+_pd_proc_2theta_range_inc        0.016711
+_pd_proc_2theta_range_max        120.0309
+_pd_proc_2theta_range_min        15.0309
+_pd_proc_wavelength              1.540560
+_refine_ls_number_parameters     64
+_refine_ls_number_reflns         291
+_refine_ls_number_restraints     6
+_refine_ls_R_I_factor            5.2218
+_journal_article_reference       'DOI: 10.1154/1.3552994'
+_cod_data_source_file            vat-5.cif
+_cod_data_source_block           vaterite
+_cod_depositor_comments
+;
+The following automatic conversions were performed:
+
+'_symmetry_cell_setting' value 'Orthorhombic' changed to
+'orthorhombic' according to the built-in table from CIF Core
+dictionary named 'cif_core.dic' version 2.4.1 from 2010-06-29.
+
+Automatic conversion script
+Id: cif_fix_values 1715 2011-07-08 13:25:40Z adriana 
+
+ Releasing structure 3000000 into public domain as published material.
+;
+_cod_database_code               3000000
+loop_
+_space_group_symop_operation_xyz
+x,y,z
+-x+1/2,y,z
+x+1/2,-y,z
+-x,-y,z
+x,y+1/2,z+1/2
+-x+1/2,y+1/2,z+1/2
+x+1/2,-y+1/2,z+1/2
+-x,-y+1/2,z+1/2
+loop_
+_atom_site_label
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_U_iso_or_equiv
+_atom_site_occupancy
+_atom_site_adp_type
+_atom_site_type_symbol
+Ca 0.50000 0.50000 0.00000 0.0235(4) 1.00000 Uiso Ca
+C 0.25000 0.640(3) 0.452(4) 0.0396(10) 1.00000 Uiso C
+O1 0.3795(2) 0.6711(16) 0.5636(17) 0.0396(10) 1.00000 Uiso O
+O2 0.25000 0.5432(12) 0.1912(14) 0.0396(10) 1.00000 Uiso O
+loop_
+_atom_type_symbol
+_atom_type_scat_Cromer_Mann_a1
+_atom_type_scat_Cromer_Mann_b1
+_atom_type_scat_Cromer_Mann_a2
+_atom_type_scat_Cromer_Mann_b2
+_atom_type_scat_Cromer_Mann_a3
+_atom_type_scat_Cromer_Mann_b3
+_atom_type_scat_Cromer_Mann_a4
+_atom_type_scat_Cromer_Mann_b4
+_atom_type_scat_Cromer_Mann_c
+_atom_type_scat_dispersion_real
+_atom_type_scat_dispersion_imag
+_atom_type_scat_source
+ca 8.62660 10.44210 7.38730 0.65990 1.58990 85.74840 1.02110 178.43700 1.37510
+0.34100 1.28600
+International_Tables_for_Crystallography_Vol.C(1991)_Tables_6.1.1.4_and_6.1.1.5
+c 2.31000 20.84390 1.02000 10.20750 1.58860 0.56870 0.86500 51.65120 0.21560
+0.01700 0.00900
+International_Tables_for_Crystallography_Vol.C(1991)_Tables_6.1.1.4_and_6.1.1.5
+o 3.04850 13.27710 2.28680 5.70110 1.54630 0.32390 0.86700 32.90890 0.25080
+0.04700 0.03200
+International_Tables_for_Crystallography_Vol.C(1991)_Tables_6.1.1.4_and_6.1.1.5
+loop_
+_geom_angle_atom_site_label_1
+_geom_angle_atom_site_label_2
+_geom_angle_atom_site_label_3
+_geom_angle
+_geom_angle_site_symmetry_1
+_geom_angle_site_symmetry_3
+O1 Ca O1 104.0(4) 7_554 8_555
+O1 Ca O1 83.0(5) 7_554 9_664
+O1 Ca O1 172.9(5) 7_554 10_665
+O1 Ca O1 111.9(6) 7_554 11_555
+O1 Ca O1 77.3(4) 7_554 12_675
+O1 Ca O2 78.2(3) 7_554 13_555
+O1 Ca O2 136.2(4) 7_554 14_665
+O1 Ca O1 99.7(6) 8_555 11_555
+O1 Ca O1 70.3(4) 8_555 12_675
+O1 Ca O2 47.1(2) 8_555 13_555
+O1 Ca O2 96.3(3) 8_555 14_665
+O1 Ca O1 168.3(7) 11_555 12_675
+O1 Ca O2 73.8(4) 11_555 13_555
+O1 Ca O2 102.0(4) 11_555 14_665
+O2 Ca O2 139.53(12) 13_555 14_665
+O1 C O1 130.0(6) 7_555 8_655
+O1 C O2 114.8(12) 7_555 9_555
+loop_
+_geom_bond_atom_site_label_1
+_geom_bond_atom_site_label_2
+_geom_bond_distance
+_geom_bond_site_symmetry_2
+Ca O2 2.281(2) .
+Ca O1 2.405(8) 1_554
+Ca O1 2.579(10) 5_544
+Ca O1 2.820(8) .
+C O1 1.211(8) .
+C O2 1.280(19) .
+O1 O2 2.098(9) .
+O1 O1 2.194(2) 2_555
+O1 O1 3.189(13) 4_665
+O1 O1 3.115(9) 8_664
+O1 O2 2.958(9) 1_556
+O1 O2 2.928(13) 5_555
+loop_
+_cod_related_entry_id
+_cod_related_entry_database
+_cod_related_entry_code
+1 AMCSD 0019019
