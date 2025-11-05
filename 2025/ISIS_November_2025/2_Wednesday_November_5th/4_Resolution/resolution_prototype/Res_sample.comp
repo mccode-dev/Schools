@@ -185,7 +185,6 @@ TRACE %{
 
   if(intersect) {
     if(t0 < 0) {
-		printf("Absored, negative time \n");
 		ABSORB;
 	}
     if(vars.isrect) {
@@ -214,8 +213,6 @@ TRACE %{
 
     /* Store initial neutron state. */
     if(p == 0) {
-		printf("ABSORBED, 0 weight \n");
-		
 		ABSORB;
 	}
     kix=V2K*vx; kiy=V2K*vy; kiz=V2K*vz;
@@ -245,7 +242,7 @@ TRACE %{
 	NORM(vx, vy, vz);
 	if (elastic==0) {
       if (delta_E_mode) {
-        E = v*v*VS2E + dE*dE*randpm1();
+        E = v*v*VS2E + dE*randpm1();
         v = sqrt(E)*SE2V;
       } else {
         E = E0 + dE*randpm1();
@@ -262,7 +259,7 @@ TRACE %{
     particle_setvar_void(_particle, res_kf_x_var, &(kfx));
     particle_setvar_void(_particle, res_kf_y_var, &(kfy));
     particle_setvar_void(_particle, res_kf_z_var, &(kfz));
-  } else printf("Missed sample \n");
+  }
 %}
 
 
