@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="demo-notes">Demo notes</h1>
+<p>Rough notes for what might be demonstrated during the presentation (very very approximate, likely to change).</p>
+<p>Any reference to jupyter notebooks below concerns notebooks found at <a href="https://github.com/mctools/ncrystal-notebooks">https://github.com/mctools/ncrystal-notebooks</a></p>
+<h2 id="after-slide-10-cfgstrings">After slide 10 (cfgstrings)</h2>
+<p>Show <a href="https://github.com/mctools/ncrystal/wiki/CfgRefDoc">https://github.com/mctools/ncrystal/wiki/CfgRefDoc</a> and perhaps the cfg-string examples on <a href="https://github.com/mctools/ncrystal/wiki/Using-NCrystal">https://github.com/mctools/ncrystal/wiki/Using-NCrystal</a></p>
+<h2 id="after-slide-13-after-pycli-apis-shown">After slide 13 (after Py+CLI APIs shown)</h2>
+<p>Play around a bit on the command-line with nctool:</p>
+<pre><code>nctool -h
+nctool "Al_sg225.ncmat"
+nctool -a "Al_sg225.ncmat"
+nctool -d "Al_sg225.ncmat"
+nctool -b
+nctool gasmix::0.7xCO2+0.3xAr/1.5atm/250K
+nctool -b | grep -i Be
+nctool "Be_sg194.ncmat"
+nctool "Be_sg194.ncmat;temp=200K"  "Be_sg194.ncmat;temp=20C"  "Be_sg194.ncmat;temp=80K"
+nctool -d "Be_sg194.ncmat"
+nctool --extract Si_sg227.ncmat
+</code></pre>
+<p>Show basic notebook, with material load + plot: <code>ncrystal1_basic_01_Introduction_and_Python_API.ipynb</code>.</p>
+<h2 id="after-slide-16-first-ncrystal-in-mcstas-slide">After slide 16 (first “NCrystal in mcstas” slide)</h2>
+<p>Open mcgui and show some simulations with an NCrystal_sample. Specifically the <code>simplencrystal.instr</code> from the demo_materials folder.</p>
+<p>Show both the 3D view of the setup and a histogram. Play a bit with wavelengths and cfg-string, and also use <code>nctool</code> during this process.</p>
+<h2 id="after-slide-18-landmap-of-data-and-cli-converters">After slide 18 (“landmap of data and CLI converters”)</h2>
+<p>Show how we can convert from CIF or to (or use) lau/laz files.</p>
+<p>We use <a href="https://www.crystallography.net/cod/3000000.html">https://www.crystallography.net/cod/3000000.html</a> as an example (just because codid::3000000 is an easy to remember database ID).</p>
+<p>First show how we can use CIF files:</p>
+<pre><code>ncrystal_cif2ncmat codid::3000000 # (see warnings)
+ncrystal_cif2ncmat codid::3000000 --showcif
+ncrystal_cif2ncmat codid::3000000 --uisotemp=293
+nctool -d autogen_CCaO3_sg40_cod3000000.ncmat
+nctool -a autogen_CCaO3_sg40_cod3000000.ncmat
+</code></pre>
+<p>Then show how we can convert to other formats:</p>
+<pre><code>ncrystal_ncmat2hkl  "autogen_CCaO3_sg40_cod3000000.ncmat;temp=300K" --format=laz -o cod3000000_300K.laz
+ncrystal_ncmat2hkl  "autogen_CCaO3_sg40_cod3000000.ncmat;temp=300K" --format=lau -o cod3000000_300K.lau
+ls -lh cod3000000_300K.laz cod3000000_300K.lau
+ncrystal_ncmat2hkl  "autogen_CCaO3_sg40_cod3000000.ncmat;temp=300K;dcutoff=0.5" --format=lau -o cod3000000_300K_trunc.lau
+ll -h cod3000000_300K_trunc.lau
+</code></pre>
+<p>We can compare with cif2hkl if we want:</p>
+<pre><code>ncrystal_cif2ncmat codid::3000000 --showcif &gt; cod3000000.cif
+cif2hkl --xtal --mode NUC -o cod3000000_via_cif2hkl.lau cod3000000.cif
+cif2hkl --powder --mode NUC -o via_cif2hkl.laz cod3000000.cif
+nctool 'autogen_CCaO3_sg40_cod3000000.ncmat;temp=293' via_cif2hkl.laz -c comp=bragg
+</code></pre>
+<h2 id="after-slide-22-mini-mc">After slide 22 (mini-mc)</h2>
+<pre><code>nctool --mc --help
+nctool --mc "2Aa" "2cm" "Al_sg225.ncmat;temp=250K" #several reflections
+nctool --mc "4.3Aa" "2cm" "Al_sg225.ncmat;temp=250K" #single reflection, multiscat effect clear.
+nctool --mc "0.5Aa" "2cm" "Al_sg225.ncmat;temp=250K"
+nctool --mc "1.0Aa" "2cm" "V_sg229.ncmat"  #Note very isotropic, but elastic+inelastic balance
+nctool --mc "4.0Aa" "2cm" "V_sg229.ncmat"  #Note bragg peak and tendency for backwards scattering.
+</code></pre>
+<p>We might also demo the relevant jupyter notebook: <code>ncrystal1_basic_03_Scatter_patterns_with_the_builtin_MiniMC_framework.ipynb</code></p>
+<h2 id="after-slide-27-ncmatcomposer">After slide 27 (NCMATComposer)</h2>
+<p>Show notebook with NCMATComposer: <code>ncrystal2_advanced_01_Creating_materials_and_the_NCMATComposer.ipynb</code></p>
+<h2 id="after-all-slides">After all slides</h2>
+<p>Spend some more time on notebooks.</p>
+</div>
+</body>
+
+</html>
