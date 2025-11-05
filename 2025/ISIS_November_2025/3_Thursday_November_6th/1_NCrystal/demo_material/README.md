@@ -82,4 +82,6 @@ Show notebook with NCMATComposer: `ncrystal2_advanced_01_Creating_materials_and_
 
 ## After all slides
 
+Mention place to ask for help, report issues, and follow project is at https://github.com/mctools/ncrystal
+
 Spend some more time on notebooks.
