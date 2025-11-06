@@ -1,4 +1,4 @@
-# Recipe for writing a perfect mirror
+# Recipe for writing a simple, semi-transparent mirror
 
 ### Initial component naming update
 * Copy the enclosed [```Arm.comp```](Arm.comp) to the local workdir, rename to ```Mirror_simple.comp```
