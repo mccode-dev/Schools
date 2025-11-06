@@ -7,15 +7,15 @@
 * Add ```SETTING PARAMETERS``` for geometry, e.g. ```yheight``` and ```zlength```
 * In ```INITIALIZE``` check that the new parameters are > 0
 ### Add propagation and checks
-* In ```TRACE```, do a ```PROP_X0``` to move the neutron to the mirror plane
-* if-statement checking that the neutron is inside the z-y ranges, otherwise ```RESTORE_NEUTRON```
+* In ```TRACE```, do a ```PROP_X0``` to move the neutron to the mirror plane (`PROP_...` and other macros are in `$MCSTAS/share/mcstas-r.h`, you may copy locally for convenience)
+* if-statement checking that the neutron is inside the z-y ranges, otherwise ```RESTORE_NEUTRON(INDEX_CURRENT_COMP, x, y, z, vx, vy, vz, t, sx, sy, sz, p);```
 ### Mirror the neutron
 * Neutrons inside mirror bounds receive a flip the sign of vx and ```SCATTER```
 ### Draw the compnent in mcdisplay
 * Add a rectangle() on the y-z plane in the ```DISPLAY``` section to
-  show the mirror (for inspiration look in `Pol_mirror`
+  show the mirror (for inspiration look in e.g. `Pol_mirror`)
 ### Add the mirror in an minimal instr and do a 1st run
-* Try using the mirror in an instrument
+* Try using the mirror in an instrument for a visualisation/TRACE. (NB: for a 'rerun' after failed execution, add -c in mcrun or "force-compile" via Simulation->Compile Instrument)
 ### Add physics!
 * Add a scalar reflectivity ```r0``` as a  ```SETTING PARAMETERS```
 * Do a MC choice with ```rand01``` in the ```TRACE``` section to see
