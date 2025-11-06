@@ -5,7 +5,7 @@
 * Edit the file changing all instances of Arm to Mirror_simple
 ### Add input parameters for geometry
 * Add ```SETTING PARAMETERS``` for geometry, e.g. ```yheight``` and ```zlength```
-* In ```INITIALIZE``` check that the new parameters are > 0
+* In ```INITIALIZE``` check via `if ()` statements that the geometry parameters are > 0, otherwise `fprintf(stderr,"Error message);exit(-1);`
 ### Add propagation and checks
 * In ```TRACE```, do a ```PROP_X0``` to move the neutron to the mirror plane (`PROP_...` and other macros are in `$MCSTAS/share/mcstas-r.h`, you may copy locally for convenience)
 * if-statement checking that the neutron is inside the z-y ranges, otherwise ```RESTORE_NEUTRON(INDEX_CURRENT_COMP, x, y, z, vx, vy, vz, t, sx, sy, sz, p);```
