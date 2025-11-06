@@ -22,14 +22,10 @@ DEFINE INSTRUMENT intrument(TH=45)
 
 /* The DECLARE section allows us to declare variables or  small      */
 /* functions in C syntax. These may be used in the whole instrument. */
-DECLARE
+USERVARS
 %{
   int color;
 %}
-
-//SHARE
-//%{
-//%}
 
 /* The INITIALIZE section is executed when the simulation starts     */
 /* (C code). You may use them as component parameter values.         */

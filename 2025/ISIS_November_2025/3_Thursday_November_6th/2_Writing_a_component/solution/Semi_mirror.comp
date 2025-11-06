@@ -7,37 +7,40 @@
 *
 * Component: Semi_mirror
 *
-* %I
+* %Identification
 *
-* Written by: Erik B Knudsen
-* Date: April 2017
-* Version: $Revision$
-* Release: McStas 2.4
+* Written by: Peter Willendrup
+* Date: November 2025
 * Origin: ISIS
 *
 * Semi-permeable mirror
 *
-* %D
+* %Description
 *
-* %P
+* %Parameters
 * Input parameters:
 *
 * (none)
 *
-* %E
+* %End
 *******************************************************************************/
 
 DEFINE COMPONENT Semi_mirror
-DEFINITION PARAMETERS ()
+
 SETTING PARAMETERS (zdepth=0.1, yheight=0.1,reflectivity=0.9,fraction=0.5)
-OUTPUT PARAMETERS (internal_color)
-/* Neutron parameters: (x,y,z,vx,vy,vz,t,sx,sy,sz,p) */ 
+
+/* Neutron parameters: (x,y,z,vx,vy,vz,t,sx,sy,sz,p) */
+SHARE
+%{
+%}
+
+USERVARS
+%{
+%}
 
 DECLARE
 %{
-  int internal_color;
 %}
-
 
 INITIALIZE
 %{
@@ -48,6 +51,8 @@ INITIALIZE
 
 TRACE
 %{
+
+   int internal_color;
    PROP_X0;
    internal_color=1;
    if (z<zdepth/2.0 && z>-zdepth/2.0 && y<yheight/2.0 && y>-yheight/2.0){
@@ -60,6 +65,14 @@ TRACE
        p*=(1-reflectivity)/(1-fraction);
      }
    }
+%}
+
+SAVE
+%{
+%}
+
+FINALLY
+%{
 %}
 
 MCDISPLAY
