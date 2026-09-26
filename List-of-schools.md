@@ -2,6 +2,9 @@
 
 | Dates  | Title/website/description  | Link to material |
 |:----------|:----------|:----------|
+| 2026/09/21-25 | Photons and Neutrons Realistic Artificial Intelligence Datasets (PaNRAID) | [GitHub](https://github.com/mccode-dev/PaNRAID/blob/main/README.md)
+| 2025/11/0-06 | 2025 ISIS STFC McStas Workshop | [GitHub](https://github.com/mccode-dev/Schools/tree/master/2025/ISIS_November_2025)
+| 2025/04 | HERCULES 2025 McXtrace Practicals | [GitHub](https://github.com/mccode-dev/Schools/tree/master/2025/SOLEIL_Hercules_April_2025) | 
 | 2024/10/7-11  | NECSA McStas-McXtrace school | [GitHub](https://github.com/McStasMcXtrace/Schools/tree/master/2024/NECSA_October_2024)  |
 | 2024/03    | SOLEIL McXtrace HERCULES session   | [GitHub](https://github.com/McStasMcXtrace/Schools/tree/master/2024/SOLEIL_Hercules_March_2024)  |
 | 2024/01/24-26    | ESS Lund/Copenhagen McStas training   | [GitHub](https://github.com/McStasMcXtrace/Schools/tree/master/2024/ESS_Jan_2024)    |
